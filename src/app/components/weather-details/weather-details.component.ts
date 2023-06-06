@@ -9,20 +9,21 @@ export class WeatherDetailsComponent {
  constructor(private DataTreatService:DataTreatService){}
  @ViewChild('targetElement') targetElement: ElementRef | undefined;
   @Input() cityData:any
-  @Input() city:any
+  city:any
   @Input() showDetails:any 
   @Output() showDetailsChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   myDate=new Date()
   DailyData:any
   thisCity:any
 update(){
+
+
   const url =`https://api.open-meteo.com/v1/forecast?latitude=${this.city.latitude}&longitude=${this.city.longitude}&hourly=temperature_2m,relativehumidity_2m,dewpoint_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,weathercode,pressure_msl,surface_pressure,cloudcover,cloudcover_low,cloudcover_mid,cloudcover_high,visibility,evapotranspiration,et0_fao_evapotranspiration,windspeed_180m,winddirection_180m,windgusts_10m,uv_index,uv_index_clear_sky,is_day&forecast_days=1`
 
   this.DataTreatService.getWeatherData(url).subscribe(
     (response) => {
       this.DailyData=response
-      console.log("daily")
-      console.log(this.DailyData)
+   
 
     },
     (error) => {
@@ -49,10 +50,14 @@ update(){
  
   updateCityName(newCityData: any): void {
     this.city = newCityData;
-    console.log(this.city)
     
   }
   ngOnInit(){
+    const city = localStorage.getItem('city')
+    if( city ) {
+      this.city=JSON.parse(city)
+     //this.onGetWeatherData(this.cityChosen.latitude,this.cityChosen.longitude)
+    }
     this.thisCity= this.cityData
     this.TempNow()
   }
@@ -188,7 +193,6 @@ update(){
     this.DataTreatService.getWeatherData(api).subscribe(
       (response) => {
         this.thisCity=response
-        console.log(response)
        
       },
       (error) => {

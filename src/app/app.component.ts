@@ -14,7 +14,7 @@ constructor(private DataTreatService:DataTreatService,private http:HttpClient){
 }
 showDetails:boolean=false
 searchText: any;
-  backgroundImage="../assets/sky.jpg"
+  backgroundImage="./assets/sky.jpg"
   zindex: boolean = false
   
   cityChosen:any =""
@@ -24,7 +24,7 @@ searchText: any;
     const date= new Date()
     const hours = date.getHours();
     if(!(hours >= 19 && hours <= 23) && (hours >= 0 && hours <= 6)) 
-    { this.backgroundImage="../assets/images/nightsky.jpg"
+    { this.backgroundImage="./assets/images/nightsky.jpg"
       this.zindex=true
     }
     const city = localStorage.getItem('city')
@@ -45,7 +45,6 @@ searchText: any;
     this.DataTreatService.getWeatherData(api).subscribe(
       (response) => {
         this.cityData=response
-        console.log(response)
         this.weatherDetailsComponent?.updateCityData(response);
         this.weatherDetailsComponent?.update()
       },
@@ -70,7 +69,6 @@ searchText: any;
     this.DataTreatService.getWeatherData(`https://geocoding-api.open-meteo.com/v1/search?name=${this.searchText}&count=20&language=en&format=json`).subscribe(
       (response) => {
         this.tryThis=response.results
-        console.log(response)
       },
       (error) => {console.error(error);}
     );

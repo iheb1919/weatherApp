@@ -44,7 +44,7 @@ constructor(private DataTreatService:DataTreatService,private http:HttpClient){
         switchMap((res: any) => {
           const ip = res.ip;
   
-          return this.http.get(`http://api.ipstack.com/197.11.161.219?access_key=bead45e80a55de67c7e7c7cfb6964e1d`);
+          return this.http.get(`http://api.ipstack.com/${ip}?access_key=bead45e80a55de67c7e7c7cfb6964e1d`);
         }),
         catchError((error) => {
           // Handle the error

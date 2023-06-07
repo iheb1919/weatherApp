@@ -1,85 +1,106 @@
-<div class=" weatherCard d-flex flex-column flex-row justify-content-evenly " >
-<div class= " px-5 gap-2 d-flex flex-column justify-content-between w-40" >
+<div class=" weatherCard d-flex flex-column flex-row justify-content-evenly ">
+    <div class=" mbView px-5 gap-2 d-flex flex-column justify-content-between w-40">
+        <div class=" header d-flex justify-content-between">
+            <h4>News</h4>
+            <h6>{{myDate | date:'EEEE dd, MMMM'}}</h6>
+        </div>
 
-    <div class=" header d-flex justify-content-between">
-        <h4>News</h4>
-        <h6>{{cityData.daily.time[0] | date:'EEEE dd, MMMM'}}</h6>
-    </div>
-   
-    <div class="bodyWeather d-flex flex-column p-3 flex-grow-1" style="position: relative;">
-        <div style="z-index: 1; position: absolute; right: -10px; width:200px ;height:200px">
-            <img width="100%" height="100%" src="./assets/sun-48190.png" alt="">
+        <div class="bodyWeather d-flex flex-column p-3 flex-grow-1"
+            style="position: relative;">
+            <div class="imgMbView"
+                style="z-index: 1; position: absolute; right: -10px; width:200px ;height:200px">
+                <!-- <img width="100%" height="100%" src="./assets/sun-48190.png" alt> -->
+                 <img width="100%" height="100%"  
+                 [src]="CloudObject[dataNow.weathercodeDaily].image" alt="img"> 
+            </div>
+            <div class="position d-flex gap-2 align-items-center">
+                <i class="bi bi-geo-alt-fill"></i>
+                <h4 class>{{city.name}}, {{city.country}}</h4>
+            </div>
+            <div class=" d-flex flex-column">
+                <h2>{{dataNow.time | date:'EEEE dd, HH:mm'}}</h2>
+                <h1> {{dataNow.temp}}°C</h1>
+                <p class="text-warning"> max {{dataNow.temperature_2m_max}} °C ,
+                    min {{dataNow.temperature_2m_min}} °C</p>
+                <div class="d-flex ww">
+                    <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-droplet-fill"></i>
+                        <p>{{dataNow.humidity}}%</p>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-fan"></i>
+                        <p>{{dataNow.windSpeed}}Km/h</p>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-compass-fill"></i>
+                        <p> {{dataNow.winddirec}}</p>
+                    </div>
+
+                </div>
+                <p class="align-self-end btn btn-primary" (click)="displ()">
+                    more Details</p>
+            </div>
         </div>
-        <div class="position d-flex gap-2 align-items-center">
-            <i class="bi bi-geo-alt-fill"></i>
-            <h4 class="">{{city.name}}, {{city.country}}</h4>
-        </div>
+
         <div class=" d-flex flex-column">
-            <h2>{{cityData.daily.time[0] | date:'EEEE dd, HH:mm'}}</h2>
-            <h1> {{dataNow.temp}}°C</h1>
-            <p class="text-warning"> max  {{cityData.daily.temperature_2m_max[0]}} °C , min {{cityData.daily.temperature_2m_min[0]}} °C</p>
-            <div class="d-flex ww">
-                <div class="d-flex flex-column align-items-center">
-                    <i class="bi bi-droplet-fill"></i>
-                    <p>{{dataNow.humidity}}%</p>
+            <div
+                class="bodyWeather footer   d-flex justify-content-between gap-4 p-2">
+                <div style="cursor: pointer;"
+                    class="d-flex flex-column justify-content-center "
+                    *ngFor="let item of cityData.daily.temperature_2m_max ,let i=index"
+                    (click)="launch(i,cityData.daily.time[i])">
+                    <img class="iconImage"
+                        [src]="CloudObject[cityData.daily.weathercode[i]].image"
+                        alt="img">
+                    <span class="align-self-center" style="font-size: .8em;">{{cityData.daily.time[i]
+                        | date:'EEEE'}}</span>
+                    <span class="align-self-center" style="font-size: .8em;">{{item}}°C</span>
                 </div>
-                <div class="d-flex flex-column align-items-center">
-                    <i class="bi bi-fan"></i>
-                    <p>{{dataNow.windSpeed}}Km/h</p>
-                </div>
-                <div class="d-flex flex-column align-items-center">
-                    <i class="bi bi-compass-fill"></i>
-                    <p>    {{dataNow.winddirec}}</p>
-                </div>
-               
             </div>
-            <p class="align-self-end btn btn-primary" (click)="update()"> more Details</p>
         </div>
+
     </div>
 
-    
-    <div class=" d-flex flex-column">
-     <div class="bodyWeather footer   d-flex justify-content-between gap-4 p-2" >
-        <div (click)="launch(cityData.daily.time[i])" style="cursor: pointer;" class="d-flex flex-column justify-content-center " *ngFor="let item of cityData.daily.temperature_2m_max ,let i=index"> 
-            <img class="iconImage" [src]="CloudObject[cityData.daily.weathercode[i]].image" alt="img">
-            <span class="align-self-center" style="font-size: .8em;">{{cityData.daily.time[i]  | date:'EEEE'}}</span>
-            <span class="align-self-center" style="font-size: .8em;">{{item}}°C</span>
-        </div>
-    </div>
-    </div>
-    
-</div>
-    
-    <div *ngIf="showDetails && DailyData.hourly" #targetElement id="#aa"class="    px-5 d-flex flex-column justify-content-between w-40" >
-    <div class=" footer  flex-column  d-flex justify-content-between gap-4 p-2" >
-        <div class="d-flex dd p-2 flex-column gap-10 justify-content-between align-items-center bodyWeather" 
-         (click)="setheight(DetailsRef)" #DetailsRef
-        *ngFor="let item of DailyData.hourly.time ,let i=index"> 
-            <div class=" w-100 d-flex fff p-2 flex-row gap-10 justify-content-between align-items-center ">
-                <div class="d-flex align-items-center">
-                    <h5>{{item | date:'HH:mm'}}</h5>
-                    <img class="iconImage" [src]="CloudObject[DailyData.hourly.weathercode[i]].image" alt="img">
+    <div *ngIf="showDetails && DailyData" #targetElement id="#aa" class="mbView px-5 d-flex flex-column justify-content-between w-40">
+        <div class=" footer  flex-column  d-flex justify-content-between gap-4 pt-2">
+            <div
+                class="d-flex dd p-2 flex-column gap-10 justify-content-between align-items-center bodyWeather"
+                (click)="setheight(DetailsRef)" #DetailsRef
+                *ngFor="let item of DailyData.hourly.time ,let i=index">
+                <div
+                    class=" w-100 d-flex fff p-2 flex-row gap-10 justify-content-between align-items-center ">
+                    <div class="d-flex align-items-center">
+                        <h5>{{item | date:'HH:mm'}}</h5>
+                        <img class="iconImage"
+                            [src]="CloudObject[DailyData.hourly.weathercode[i]].image"
+                            alt="img">
+                    </div>
+                    <div class="d-flex align-items-center me-5">
+                        <h4>{{ DailyData.hourly.temperature_2m[i]}}°C</h4>
+                    </div>
+                    <i class="bi bi-caret-down-fill "></i>
                 </div>
-                <div class="d-flex align-items-center me-5">
-                    <span class="align-self-center" style="font-size: .8em;">{{cityData.daily.time[i]  | date:'EEEE'}}</span>
-                    <h4 >{{ DailyData.hourly.temperature_2m[i]}}°C</h4>
+                <div class=" det d-flex flex-wrap gap-2 ">
+                    <h4 style="width: 100%;">
+                        {{CloudObject[DailyData.hourly.weathercode[i]].text}}</h4>
+                    <div class="classDet"><span> Wind </span> <strong>
+                            {{DailyData.hourly.windspeed_180m[i]}}Km/h </strong></div>
+                    <div class="classDet"><span> Wind Gusts </span> <strong>
+                            {{DailyData.hourly.windgusts_10m[i]}}Km/h</strong></div>
+                    <div class="classDet"><span> Humidity </span> <strong>
+                            {{DailyData.hourly.relativehumidity_2m[i]}}%
+                        </strong></div>
+                    <div class="classDet"><span> Dew Point </span> <strong>
+                            {{DailyData.hourly.dewpoint_2m[i]}} °C</strong></div>
+                    <div class="classDet"><span> Cloud Cover </span> <strong>
+                            {{DailyData.hourly.cloudcover[i]}}%</strong></div>
+                    <div class="classDet"> <span> Visibility </span> <strong>
+                            {{DailyData.hourly.visibility[i]}}m</strong></div>
+                    <div class="classDet"><span> uv_index_clear_sky </span>
+                        <strong> {{DailyData.hourly.uv_index_clear_sky[i]}}</strong></div>
+
                 </div>
-                <i class="bi bi-caret-down-fill "></i>
-            </div>
-            <div class=" det d-flex flex-wrap gap-2 ">
-                <h4 style="width: 100%;"> {{CloudObject[DailyData.hourly.weathercode[i]].text}}</h4>
-                <div class="classDet"><span>  Wind    </span>   <strong> {{DailyData.hourly.windspeed_180m[i]}}Km/h </strong></div>
-                <div class="classDet"><span>  Wind Gusts   </span>    <strong> {{DailyData.hourly.windgusts_10m[i]}}Km/h</strong></div>
-                <div class="classDet"><span> Humidity   </span>  <strong> {{DailyData.hourly.relativehumidity_2m[i]}}% </strong></div>
-                <div class="classDet"><span> Dew Point   </span>   <strong> {{DailyData.hourly.dewpoint_2m[i]}} °C</strong></div>  
-                <div class="classDet"><span> Cloud Cover   </span>  <strong> {{DailyData.hourly.cloudcover[i]}}%</strong></div>
-                <div class="classDet"> <span> Visibility   </span>  <strong> {{DailyData.hourly.visibility[i]}}m</strong></div>
-                <div class="classDet"><span> uv_index_clear_sky   </span>  <strong> {{DailyData.hourly.uv_index_clear_sky[i]}}</strong></div>
-                <!-- <div class="classDet"></div>
-                <div class="classDet"></div>
-                <div class="classDet"></div> -->
             </div>
         </div>
-    </div>
     </div>
 </div>

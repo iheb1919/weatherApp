@@ -4,33 +4,36 @@
     <div class="select d-flex gap-3 align-items-center" style="width: 34rem;">
      <div class="dropdown ">
       <div class="input-group " id="dropdownNotification" data-bs-toggle="dropdown" aria-expanded="false">
-          <input type="text" (input)="onData()" [(ngModel)]="searchText" class="form-control" placeholder="Search for country" >
+          <input type="text" (input)="getAllPlaces()" [(ngModel)]="searchText" class="form-control" placeholder="Search for country" >
         <i class=" search bi bi-search" style="color:#000;"></i> 
       </div>
       <div class="dropdown-menu text-small shadow p-0" 
         aria-labelledby="dropdownNotification">
        
         <ul style="max-height: 500px; overflow-y: auto;" class="list-group">
-          <li  class="list-group-item  " (click)="setName(item)" *ngFor="let item of tryThis "  [attr.data-value]="item.name" > 
+          <li  class="list-group-item  " *ngIf="!coutriesSearched"> None</li>
+          <li  class="list-group-item  " (click)="setName(item)" *ngFor="let item of coutriesSearched "  [attr.data-value]="item.name" > 
             <img [src]="getImageSource(item.country_code)" height="20px" width="30px" alt="">
-            {{item.admin3}}, {{item.admin2}}  ,{{item.admin1}}, {{item.country}}
+            {{item.name}}  ,{{item.admin1}}, {{item.country}}
           </li>
         </ul>
-        <!-- [src]="'./assets/images/png100px/' + item.key + '.png'" -->
         
       </div>
     </div>
-     <div *ngIf="cityData">
+     <div *ngIf="cityData.daily">
       <i class="bi bi-x-lg" (click)="destroyCity()" ></i>
     </div> 
     </div>
 
-     <app-weather-details *ngIf="cityData" 
+     <app-weather-details *ngIf="cityData.daily" 
      class="d-flex align-items-center justify-content-center"
       style=" display: block; width:100%"
+
        [cityData]="cityData" 
-       
        [showDetails]="showDetails"  
-       (showDetailsChange)="showDetails = $event"></app-weather-details>
+       (showDetailsChange)="showDetails = $event">
+
+      </app-weather-details>
   </div>
 </div>
+<!--  -->

@@ -3,6 +3,8 @@
     border-radius: 5px;
 }
  .weatherCard{
+    margin-top: 20px ;
+
     width:50em  !important ;
     
 } 
@@ -20,6 +22,12 @@
 }
 
 @media (max-width:600px) {
+    .imgMbView{
+        top: 80px !important;
+        right: -30px !important;
+        width: 150px !important;
+        height: 150px !important;
+    }
 
     .weatherCard{
         width:100% !important ;
@@ -27,6 +35,7 @@
     }
     .footer{
         flex-wrap: wrap !important;
+        width: 100%;
     }
     .iconImage{
         width: 50px !important;
@@ -38,6 +47,10 @@
     .classDet{
         width: 100% !important;
     }
+
+    .mbView{
+        padding: 0px!important;
+    }
     
 }
 .dd{
@@ -46,7 +59,7 @@
     transition: all  .8s ease-in; 
 
 }
-.fullParag{
+.full{
     max-height: 500px !important;
    transition: all  .8s ease-in; 
 }

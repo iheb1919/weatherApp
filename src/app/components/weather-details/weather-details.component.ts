@@ -14,22 +14,22 @@ export class WeatherDetailsComponent {
   @Output() showDetailsChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   myDate=new Date()
   DailyData:any
-  thisCity:any
-update(){
+  thisCity:any={}
 
-
-  const url =`https://api.open-meteo.com/v1/forecast?latitude=${this.city.latitude}&longitude=${this.city.longitude}&hourly=temperature_2m,relativehumidity_2m,dewpoint_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,weathercode,pressure_msl,surface_pressure,cloudcover,cloudcover_low,cloudcover_mid,cloudcover_high,visibility,evapotranspiration,et0_fao_evapotranspiration,windspeed_180m,winddirection_180m,windgusts_10m,uv_index,uv_index_clear_sky,is_day&forecast_days=1`
-
+hourlyDetails(startDate:any){
+  startDate=startDate.split('T')[0]
+  const url =`https://api.open-meteo.com/v1/forecast?latitude=${this.city.latitude}&longitude=${this.city.longitude}&hourly=temperature_2m,relativehumidity_2m,dewpoint_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,weathercode,pressure_msl,surface_pressure,cloudcover,cloudcover_low,cloudcover_mid,cloudcover_high,visibility,evapotranspiration,et0_fao_evapotranspiration,windspeed_180m,winddirection_180m,windgusts_10m,uv_index,uv_index_clear_sky,is_day&forecast_days=1&start_date=${startDate}&end_date=${startDate}`
   this.DataTreatService.getWeatherData(url).subscribe(
     (response) => {
       this.DailyData=response
-   
-
     },
     (error) => {
       console.error(error);
     }
   )
+ 
+}
+displ(){
   this.showDetails=!this.showDetails
   this.showDetailsChange.emit(this.showDetails);
   setTimeout(()=>{
@@ -37,65 +37,78 @@ update(){
   },200)
 }
   dataNow={
+    weathercodeDaily:0,
+    weathercodeHourly:0,
+    time:"",
     humidity:"",
     temp:"",
     winddirec:"",
-    windSpeed:""
+    windSpeed:"",
+    temperature_2m_max:"",
+    temperature_2m_min:""
   }
   hourlyData=[]
  updateCityData(newCityData: any): void {
     this.cityData = newCityData;
-    this.TempNow()
+    this.TempNowByHour()
   }
  
   updateCityName(newCityData: any): void {
     this.city = newCityData;
-    
   }
   ngOnInit(){
-    const city = localStorage.getItem('city')
-    if( city ) {
-      this.city=JSON.parse(city)
-     //this.onGetWeatherData(this.cityChosen.latitude,this.cityChosen.longitude)
-    }
-    this.thisCity= this.cityData
-    this.TempNow()
+
+setTimeout(() => {
+  const city = localStorage.getItem('city')
+  if( city ) {
+    this.city=JSON.parse(city)
   }
-  TempNow(){
-    const direction = ['North','North East', 'East','South East', 'South','South West', 'West','North West']
+  this.thisCity= this.cityData
+  this.TempNowByHour()
+  this.hourlyDetails(this.myDate.toISOString())
+}, 200);
+
+  }
+  direction = ['North','North East', 'East','South East', 'South','South West', 'West','North West']
+
+  TempNowByHour(){
     const currentHour = this.myDate.getHours();
     const index = this.cityData.hourly.time.findIndex((time: string | number | Date) => {
     const hour = new Date(time).getHours();
       return (hour === currentHour)
     });
     this.dataNow={
+      weathercodeDaily:this.cityData.daily.weathercode[index],
+      weathercodeHourly:this.cityData.hourly.weathercode[index],
+      time:this.cityData.hourly.time[index] ,
       humidity:this.cityData.hourly.relativehumidity_2m[index],
       temp:this.cityData.hourly.temperature_2m[index],
-      winddirec:    direction [Math.floor((( this.cityData.hourly.winddirection_180m[index]+22.5)%360)/45)]
-     ,
-      windSpeed:this.cityData.hourly.windspeed_180m[index]
+      winddirec:this.direction [Math.floor((( this.cityData.hourly.winddirection_180m[index]+22.5)%360)/45)],
+      windSpeed:this.cityData.hourly.windspeed_180m[index],
+      temperature_2m_max:this.cityData.daily.temperature_2m_max[index],
+      temperature_2m_min:this.cityData.daily.temperature_2m_min[index]
     }
   }
 
   CloudObject :any = {
     0: { text: "No clouds observed", image: "./assets/images/fullsun-removebg.png" },
     1: { text: "Clearing sky", image: "./assets/images/fullsun-removebg.png" },
-    2: { text: "Partly cloudy", image: "./assets/images/fullsun-removebg.png" },
-    3: { text: "Cloudy", image: "./assets/images/fullsun-removebg.png" },
-    4: { text: "Reduced visibility due to smoke", image: "./assets/images/fullsun-removebg.png" },
-    5: { text: "Haze", image: "./assets/images/fullsun-removebg.png" },
-    6: { text: "Dust in the air", image: "./assets/images/fullsun-removebg.png" },
+    2: { text: "Partly cloudy", image: "./assets/images/cloudy.png" },
+    3: { text: "Cloudy", image: "./assets/images/nosun.png" },
+    4: { text: "Reduced visibility due to smoke", image: "./assets/images/cloudy.png" },
+    5: { text: "Haze", image: "./assets/images/cloudy.png" },
+    6: { text: "Dust in the air", image: "./assets/images/cloudy.png" },
     7: { text: "Dust or sand raised by wind", image: "./assets/images/fullsun-removebg.png" },
-    8: { text: "Dust whirl or sand whirl", image: "./assets/images/fullsun-removebg.png" },
+    8: { text: "Dust whirl or sand whirl", image: "./assets/images/cloudy.png" },
     9: { text: "Duststorm or sandstorm", image: "./assets/images/fullsun-removebg.png" },
-    10: { text: "Mist", image: "./assets/images/fullsun-removebg.png" },
-    11: { text: "Fog or ice fog", image: "./assets/images/fullsun-removebg.png" },
+    10: { text: "Mist", image: "./assets/images/cloudy.png" },
+    11: { text: "Fog or ice fog", image: "./assets/images/cloudy.png" },
     12: { text: "Continuous fog", image: "./assets/images/fullsun-removebg.png" },
-    13: { text: "Visible lightning", image: "./assets/images/fullsun-removebg.png" },
-    14: { text: "Precipitation in sight", image: "./assets/images/fullsun-removebg.png" },
-    15: { text: "Precipitation reaching ground", image: "./assets/images/fullsun-removebg.png" },
-    16: { text: "Precipitation near station", image: "./assets/images/fullsun-removebg.png" },
-    17: { text: "Thunderstorm without precipitation", image: "./assets/images/fullsun-removebg.png" },
+    13: { text: "Visible lightning", image: "./assets/images/cloudy.png" },
+    14: { text: "Precipitation in sight", image: "./assets/images/littleRain.png" },
+    15: { text: "Precipitation reaching ground", image: "./assets/images/littleRain.png" },
+    16: { text: "Precipitation near station", image: "./assets/images/littleRain.png" },
+    17: { text: "Thunderstorm without precipitation", image: "./assets/images/littleRain.png" },
     18: { text: "Squalls", image: "./assets/images/fullsun-removebg.png" },
     19: { text: "Funnel cloud(s)", image: "./assets/images/fullsun-removebg.png" },
     20: { text: "Drizzle or snow grains", image: "./assets/images/cloudy.png" },
@@ -108,16 +121,16 @@ update(){
     27: { text: "Shower(s) of hail", image: "./assets/images/cloudy.png" },
     28: { text: "Fog or ice fog", image: "./assets/images/cloudy.png" },
     29: { text: "Thunderstorm", image: "./assets/images/cloudy.png" },
-    30: { text: "Duststorm or sandstorm", image: "./assets/images/removebg3.png" },
-    31: { text: "No change in duststorm or sandstorm", image: "./assets/images/removebg3.png" },
-    32: { text: "Increase in duststorm or sandstorm", image: "./assets/images/removebg3.png" },
-    33: { text: "Severe duststorm or sandstorm", image: "./assets/images/removebg3.png" },
-    34: { text: "No change in duststorm or sandstorm", image: "./assets/images/removebg3.png" },
-    35: { text: "Increase in duststorm or sandstorm", image: "./assets/images/removebg3.png" },
-    36: { text: "Blowing snow (low)", image: "./assets/images/removebg3.png" },
-    37: { text: "Heavy drifting snow", image: "./assets/images/removebg3.png" },
-    38: { text: "Blowing snow (high)", image: "./assets/images/removebg3.png" },
-    39: { text: "Heavy drifting snow", image: "./assets/images/removebg3.png" },
+    30: { text: "Duststorm or sandstorm", image: "./assets/images/snow.png" },
+    31: { text: "No change in duststorm or sandstorm", image: "./assets/images/snow.png" },
+    32: { text: "Increase in duststorm or sandstorm", image: "./assets/images/snow.png" },
+    33: { text: "Severe duststorm or sandstorm", image: "./assets/images/snow.png" },
+    34: { text: "No change in duststorm or sandstorm", image: "./assets/images/snow.png" },
+    35: { text: "Increase in duststorm or sandstorm", image: "./assets/images/snow.png" },
+    36: { text: "Blowing snow (low)", image: "./assets/images/snow.png" },
+    37: { text: "Heavy drifting snow", image: "./assets/images/snow.png" },
+    38: { text: "Blowing snow (high)", image: "./assets/images/snow.png" },
+    39: { text: "Heavy drifting snow", image: "./assets/images/snow.png" },
     40: { text: "Fog or ice fog in the distance", image: "./assets/images/nosun.png" },
     41: { text: "Fog or ice fog in patches", image: "./assets/images/nosun.png" },
     42: { text: "Thinning fog or ice fog", image: "./assets/images/nosun.png" },
@@ -182,25 +195,30 @@ update(){
 
   setheight(button: any) {
     const btn = button as HTMLElement 
-    btn.classList.toggle('fullParag')
-    
+    btn.classList.toggle('full')
   }
-  launch(e:any){
-    this.set(this.city.latitude,this.city.longitude)
+  launch(e:any, date:any){
+    const currentHour = this.myDate.getHours();
+    const index = this.cityData.hourly.time.findIndex((time: string | number | Date) => {
+    const hour = new Date(time).getHours();
+      return (hour === currentHour)
+    });
+    this.dataNow={
+      weathercodeDaily:this.cityData.daily.weathercode[e],
+      weathercodeHourly:this.cityData.hourly.weathercode[e],
+      time:this.cityData.hourly.time[e*24+index] ,
+      humidity:this.cityData.hourly.relativehumidity_2m[e],
+      temp:this.cityData.hourly.temperature_2m[e],
+      winddirec:this.direction [Math.floor((( this.cityData.hourly.winddirection_180m[e]+22.5)%360)/45)],
+      windSpeed:this.cityData.hourly.windspeed_180m[e],
+       temperature_2m_max:this.cityData.daily.temperature_2m_max[e],
+      temperature_2m_min:this.cityData.daily.temperature_2m_min[e] 
+
+    }
+    this.hourlyDetails(date)
+
    }
-  set(latitude: number,longitude: number){
-    const api=`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&forecast_days=1&start_date=2023-06-06&end_date=2023-06-07&hourly=temperature_2m,relativehumidity_2m,cloudcover,windspeed_180m,winddirection_180m&daily=temperature_2m_max,temperature_2m_min,uv_index_clear_sky_max&timezone=Europe%2FLondon&daily=weathercode`
-    this.DataTreatService.getWeatherData(api).subscribe(
-      (response) => {
-        this.thisCity=response
-       
-      },
-      (error) => {
-        console.error(error);
-      }
-    )
-    
-  }
+  
 
 }
 

@@ -7,22 +7,54 @@ import { DataTreatService } from 'src/app/services/data-treat.service';
 })
 export class WeatherDetailsComponent {
  constructor(private DataTreatService:DataTreatService){}
- @ViewChild('targetElement') targetElement: ElementRef | undefined;
-  @Input() cityData:any
-  city:any={}
-  @Input() backupDAta :any
-  @Input() showDetails:any 
-  @Output() showDetailsChange: EventEmitter<boolean> = new EventEmitter<boolean>();
-  myDate=new Date()
-  DailyData:any
-  thisCity:any={}
 
+ @ViewChild('targetElement') targetElement: ElementRef | undefined;
+ @Input() cityData:any
+ city:any={}
+ @Input() backupDAta :any
+ @Input() showDetails:any 
+ @Output() showDetailsChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+ myDate=new Date()
+ DailyData:any
+ thisCity:any={}
+ direction = ['North','North East', 'East','South East', 'South','South West', 'West','North West']
+  dataNow={
+    weathercodeDaily:0,
+    weathercodeHourly:0,
+    time:"",
+    humidity:"",
+    temp:"",
+    winddirec:"",
+    windSpeed:"",
+    temperature_2m_max:"",
+    temperature_2m_min:""
+  }
+/*   ngOnInit(){
+
+   setTimeout(()=>{
+
+     const city = localStorage.getItem('city')
+   if( city ) {
+     this.city=JSON.parse(city)
+   }  
+   
+   this.thisCity= this.cityData
+   console.log("thisCity",this.cityData)
+   this.TempNowByHour()
+   
+   this.hourlyDetails(this.myDate.toISOString())
+   },200)
+   
+    
+      } */
+    
 hourlyDetails(startDate:any){
   startDate=startDate.split('T')[0]
   const url =`https://api.open-meteo.com/v1/forecast?latitude=${this.city.latitude}&longitude=${this.city.longitude}&hourly=temperature_2m,relativehumidity_2m,dewpoint_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,weathercode,pressure_msl,surface_pressure,cloudcover,cloudcover_low,cloudcover_mid,cloudcover_high,visibility,evapotranspiration,et0_fao_evapotranspiration,windspeed_180m,winddirection_180m,windgusts_10m,uv_index,uv_index_clear_sky,is_day&forecast_days=1&start_date=${startDate}&end_date=${startDate}`
   this.DataTreatService.getWeatherData(url).subscribe(
     (response) => {
       this.DailyData=response
+     // console.log(this.DailyData)
     },
     (error) => {
       console.error(error);
@@ -37,65 +69,42 @@ displ(){
     this.targetElement?.nativeElement.scrollIntoView({ behavior: 'smooth' });
   },200)
 }
-  dataNow={
-    weathercodeDaily:0,
-    weathercodeHourly:0,
-    time:"",
-    humidity:"",
-    temp:"",
-    winddirec:"",
-    windSpeed:"",
-    temperature_2m_max:"",
-    temperature_2m_min:""
-  }
+ 
   hourlyData=[]
  updateCityData(newCityData: any): void {
-    this.cityData = newCityData;
+    this.city = newCityData;
     this.TempNowByHour()
+    console.log("city Data updated",this.cityData)
   }
  
   updateCityName(newCityData: any): void {
     this.city = newCityData;
   }
-  ngOnInit(){
-
-setTimeout(() => {
-    const city = localStorage.getItem('city')
-  if( city ) {
-    this.city=JSON.parse(city)
-  }  
-  else {
-
-    this.city.name=this.backupDAta.city,
-    this.city.country=this.backupDAta.country_name
-    this.city.latitude=this.backupDAta.latitude
-    this.city.longitude=this.backupDAta.longitude
-  }
-  this.thisCity= this.cityData
-  this.TempNowByHour()
-  this.hourlyDetails(this.myDate.toISOString())
-}, 200);
-
-  }
-  direction = ['North','North East', 'East','South East', 'South','South West', 'West','North West']
-
+ 
   TempNowByHour(){
-    const currentHour = this.myDate.getHours();
+    const currentHour = this.myDate;
     const index = this.cityData.hourly.time.findIndex((time: string | number | Date) => {
     const hour = new Date(time).getHours();
-      return (hour === currentHour)
+      return (hour === currentHour.getHours())
     });
+    const dIndex = this.cityData.daily.time.findIndex((time: string | number | Date) => {
+      const day = new Date(time).toISOString().split('T')[0];
+        return (day === currentHour.toISOString().split('T')[0])
+      });
+    
     this.dataNow={
-      weathercodeDaily:this.cityData.daily.weathercode[index],
+      weathercodeDaily:this.cityData.daily.weathercode[dIndex],
       weathercodeHourly:this.cityData.hourly.weathercode[index],
       time:this.cityData.hourly.time[index] ,
       humidity:this.cityData.hourly.relativehumidity_2m[index],
       temp:this.cityData.hourly.temperature_2m[index],
       winddirec:this.direction [Math.floor((( this.cityData.hourly.winddirection_180m[index]+22.5)%360)/45)],
       windSpeed:this.cityData.hourly.windspeed_180m[index],
-      temperature_2m_max:this.cityData.daily.temperature_2m_max[index],
-      temperature_2m_min:this.cityData.daily.temperature_2m_min[index]
+      temperature_2m_max:this.cityData.daily.temperature_2m_max[dIndex],
+      temperature_2m_min:this.cityData.daily.temperature_2m_min[dIndex]
     }
+    
+
   }
 
   CloudObject :any = {
@@ -221,12 +230,8 @@ setTimeout(() => {
       windSpeed:this.cityData.hourly.windspeed_180m[e],
        temperature_2m_max:this.cityData.daily.temperature_2m_max[e],
       temperature_2m_min:this.cityData.daily.temperature_2m_min[e] 
-
     }
     this.hourlyDetails(date)
-
    }
-  
-
 }
 

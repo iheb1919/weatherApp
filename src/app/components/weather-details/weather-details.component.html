@@ -1,4 +1,4 @@
-<div class=" weatherCard d-flex flex-column flex-row justify-content-evenly ">
+<div  class=" weatherCard d-flex flex-column flex-row justify-content-evenly ">
     <div class=" mbView px-5 gap-2 d-flex flex-column justify-content-between w-40">
         <div class=" header d-flex justify-content-between">
             <h4>News</h4>
@@ -11,13 +11,13 @@
                 style="z-index: 1; position: absolute; right: -10px; width:200px ;height:200px">
                 <!-- <img width="100%" height="100%" src="./assets/sun-48190.png" alt> -->
                  <img width="100%" height="100%"  
-                 [src]="CloudObject[dataNow.weathercodeDaily].image" alt="img"> 
+                 [src]="CloudObject[dataNow.weathercodeHourly]?.image" [alt]="dataNow.weathercodeDaily"> 
             </div>
             <div class="position d-flex gap-2 align-items-center">
                 <i class="bi bi-geo-alt-fill"></i>
                  <h4 class>{{city?.name}}, {{city?.country}}</h4> 
             </div>
-            <div class=" d-flex flex-column">
+             <div class=" d-flex flex-column">
                 <h2>{{dataNow.time | date:'EEEE dd, HH:mm'}}</h2>
                 <h1> {{dataNow.temp}}°C</h1>
                 <p class="text-warning"> max {{dataNow.temperature_2m_max}} °C ,

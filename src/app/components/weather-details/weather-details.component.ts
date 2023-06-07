@@ -11,6 +11,7 @@ export class WeatherDetailsComponent {
  @ViewChild('targetElement') targetElement: ElementRef | undefined;
  @Input() cityData:any
  city:any={}
+ cityName:any
  @Input() backupDAta :any
  @Input() showDetails:any 
  @Output() showDetailsChange: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -28,6 +29,10 @@ export class WeatherDetailsComponent {
     windSpeed:"",
     temperature_2m_max:"",
     temperature_2m_min:""
+  }
+  ngOnInit(){
+    this.updateCityData(this.cityData)
+    this.updateCityName(this.backupDAta)
   }
 /*   ngOnInit(){
 
@@ -50,11 +55,10 @@ export class WeatherDetailsComponent {
     
 hourlyDetails(startDate:any){
   startDate=startDate.split('T')[0]
-  const url =`https://api.open-meteo.com/v1/forecast?latitude=${this.city.latitude}&longitude=${this.city.longitude}&hourly=temperature_2m,relativehumidity_2m,dewpoint_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,weathercode,pressure_msl,surface_pressure,cloudcover,cloudcover_low,cloudcover_mid,cloudcover_high,visibility,evapotranspiration,et0_fao_evapotranspiration,windspeed_180m,winddirection_180m,windgusts_10m,uv_index,uv_index_clear_sky,is_day&forecast_days=1&start_date=${startDate}&end_date=${startDate}`
+  const url =`https://api.open-meteo.com/v1/forecast?latitude=${this.cityName.latitude}&longitude=${this.cityName.longitude}&hourly=temperature_2m,relativehumidity_2m,dewpoint_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,weathercode,pressure_msl,surface_pressure,cloudcover,cloudcover_low,cloudcover_mid,cloudcover_high,visibility,evapotranspiration,et0_fao_evapotranspiration,windspeed_180m,winddirection_180m,windgusts_10m,uv_index,uv_index_clear_sky,is_day&forecast_days=1&start_date=${startDate}&end_date=${startDate}`
   this.DataTreatService.getWeatherData(url).subscribe(
     (response) => {
       this.DailyData=response
-     // console.log(this.DailyData)
     },
     (error) => {
       console.error(error);
@@ -74,12 +78,11 @@ displ(){
  updateCityData(newCityData: any): void {
     this.city = newCityData;
     this.TempNowByHour()
-    console.log("city Data updated",this.cityData)
   }
  
-  updateCityName(newCityData: any): void {
-    this.city = newCityData;
-  }
+   updateCityName(newCityData: any): void {
+    this.cityName = newCityData;
+  } 
  
   TempNowByHour(){
     const currentHour = this.myDate;

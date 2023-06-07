@@ -14,6 +14,7 @@ constructor(private DataTreatService:DataTreatService,private http:HttpClient){
   const city = localStorage.getItem('city')
     if( city ) {
       this.cityChosen=JSON.parse(city)
+      this.searchText=this.cityChosen.name
      this.onGetWeatherData(this.cityChosen.latitude,this.cityChosen.longitude)
     }
 }
@@ -38,9 +39,8 @@ backupDa:boolean=false
     if( city ) {
        this.backupDAta=JSON.parse(city)
       this.onGetWeatherData( this.backupDAta.latitude,this.backupDAta.longitude)
-      console.log("this.backupDAta")
+    
 
-      console.log(this.backupDAta)
 
     }
   /*   else {
@@ -85,7 +85,9 @@ backupDa:boolean=false
        console.log("No support for geolocation")
     }
   } */
-   /* Remove selected data */
+   
+  
+  /* Remove selected data */
    destroyCity(){
       this.showDetails=false
       localStorage.removeItem('city')
@@ -96,6 +98,7 @@ backupDa:boolean=false
  
    /* Get country selected data */
   onGetWeatherData(latitude: number,longitude: number): void {
+    this.loader=true
     const api=`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relativehumidity_2m,weathercode,windspeed_180m,winddirection_180m&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FLondon&daily=weathercode`
     this.DataTreatService.getWeatherData(api).subscribe(
       (response) => {
@@ -103,7 +106,6 @@ backupDa:boolean=false
         this.cityData.hourly=response.hourly
         this.weatherDetailsComponent?.updateCityData(this.cityData); 
         this.weatherDetailsComponent?.updateCityName(this.backupDAta); 
-        
         this.weatherDetailsComponent?.hourlyDetails(this.date.toISOString())
         this.backupDa=true
         this.loader=false
@@ -121,9 +123,12 @@ backupDa:boolean=false
   /* save country selected*/ 
   setName(event: any){
     localStorage.setItem('city',JSON.stringify(event))
+    this.backupDAta=event
     this.onGetWeatherData(event.latitude,event.longitude)
-    this.weatherDetailsComponent?.updateCityName(event);
-    this.weatherDetailsComponent?.updateCityData(event)
+    
+    
+    
+
     this.searchText=event.name
     this.getAllPlaces()
   }

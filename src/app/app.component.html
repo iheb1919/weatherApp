@@ -28,7 +28,7 @@
      <app-weather-details *ngIf="cityData.daily" 
      class="d-flex align-items-center justify-content-center"
       style=" display: block; width:100%"
-
+      [backupDAta]="backupDAta"
        [cityData]="cityData" 
        [showDetails]="showDetails"  
        (showDetailsChange)="showDetails = $event">

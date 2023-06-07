@@ -9,7 +9,8 @@ export class WeatherDetailsComponent {
  constructor(private DataTreatService:DataTreatService){}
  @ViewChild('targetElement') targetElement: ElementRef | undefined;
   @Input() cityData:any
-  city:any
+  city:any={}
+  @Input() backupDAta :any
   @Input() showDetails:any 
   @Output() showDetailsChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   myDate=new Date()
@@ -59,9 +60,16 @@ displ(){
   ngOnInit(){
 
 setTimeout(() => {
-  const city = localStorage.getItem('city')
+    const city = localStorage.getItem('city')
   if( city ) {
     this.city=JSON.parse(city)
+  }  
+  else {
+
+    this.city.name=this.backupDAta.city,
+    this.city.country=this.backupDAta.country_name
+    this.city.latitude=this.backupDAta.latitude
+    this.city.longitude=this.backupDAta.longitude
   }
   this.thisCity= this.cityData
   this.TempNowByHour()

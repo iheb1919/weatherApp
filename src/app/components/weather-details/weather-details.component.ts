@@ -20,6 +20,8 @@ export class WeatherDetailsComponent {
  thisCity:any={}
  direction = ['North','North East', 'East','South East', 'South','South West', 'West','North West']
   dataNow={
+    sunRise:"",
+    sunSet:"",
     weathercodeDaily:0,
     weathercodeHourly:0,
     time:"",
@@ -33,32 +35,19 @@ export class WeatherDetailsComponent {
   ngOnInit(){
     this.updateCityData(this.cityData)
     this.updateCityName(this.backupDAta)
-  }
-/*   ngOnInit(){
-
-   setTimeout(()=>{
-
-     const city = localStorage.getItem('city')
-   if( city ) {
-     this.city=JSON.parse(city)
-   }  
-   
-   this.thisCity= this.cityData
-   console.log("thisCity",this.cityData)
-   this.TempNowByHour()
-   
-   this.hourlyDetails(this.myDate.toISOString())
-   },200)
-   
     
-      } */
+    this.hourlyDetails(this.myDate.toISOString().split('T')[0])
+  }
+
     
 hourlyDetails(startDate:any){
   startDate=startDate.split('T')[0]
+
   const url =`https://api.open-meteo.com/v1/forecast?latitude=${this.cityName.latitude}&longitude=${this.cityName.longitude}&hourly=temperature_2m,relativehumidity_2m,dewpoint_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,weathercode,pressure_msl,surface_pressure,cloudcover,cloudcover_low,cloudcover_mid,cloudcover_high,visibility,evapotranspiration,et0_fao_evapotranspiration,windspeed_180m,winddirection_180m,windgusts_10m,uv_index,uv_index_clear_sky,is_day&forecast_days=1&start_date=${startDate}&end_date=${startDate}`
   this.DataTreatService.getWeatherData(url).subscribe(
     (response) => {
       this.DailyData=response
+      
     },
     (error) => {
       console.error(error);
@@ -82,6 +71,7 @@ displ(){
  
    updateCityName(newCityData: any): void {
     this.cityName = newCityData;
+    this.cityName.fullName=this.DataTreatService.getLocationDetails(newCityData)
   } 
  
   TempNowByHour(){
@@ -92,10 +82,12 @@ displ(){
     });
     const dIndex = this.cityData.daily.time.findIndex((time: string | number | Date) => {
       const day = new Date(time).toISOString().split('T')[0];
-        return (day === currentHour.toISOString().split('T')[0])
-      });
+      return (day === currentHour.toISOString().split('T')[0])
+    });
     
     this.dataNow={
+      sunRise:this.cityData.daily.sunrise[dIndex],
+      sunSet:this.cityData.daily.sunset[dIndex],
       weathercodeDaily:this.cityData.daily.weathercode[dIndex],
       weathercodeHourly:this.cityData.hourly.weathercode[index],
       time:this.cityData.hourly.time[index] ,
@@ -232,8 +224,11 @@ displ(){
       winddirec:this.direction [Math.floor((( this.cityData.hourly.winddirection_180m[e]+22.5)%360)/45)],
       windSpeed:this.cityData.hourly.windspeed_180m[e],
        temperature_2m_max:this.cityData.daily.temperature_2m_max[e],
-      temperature_2m_min:this.cityData.daily.temperature_2m_min[e] 
+      temperature_2m_min:this.cityData.daily.temperature_2m_min[e] ,
+      sunRise:this.cityData.daily.sunrise[e],
+    sunSet:this.cityData.daily.sunset[e],
     }
+
     this.hourlyDetails(date)
    }
 }

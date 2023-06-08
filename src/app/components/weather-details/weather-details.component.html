@@ -15,7 +15,7 @@
             </div>
             <div class="position d-flex gap-2 align-items-center">
                 <i class="bi bi-geo-alt-fill"></i>
-                 <h4 class>{{cityName?.name}}, {{cityName?.country}}</h4> 
+                 <h4 class> {{cityName?.fullName}}</h4> 
             </div>
              <div class=" d-flex flex-column">
                 <h2>{{dataNow.time | date:'EEEE dd, HH:mm'}}</h2>
@@ -37,12 +37,37 @@
                     </div>
 
                 </div>
-                <p class="align-self-end btn btn-primary" (click)="displ()">
+
+                    <!--  -->
+                    <div class="d-flex ww">
+                        <div class="d-flex flex-column align-items-center">
+                            <i class="bi bi-sunrise-fill fs-3"></i>
+                            <p>{{dataNow.sunRise | date:'hh:mm:ss' }}</p>
+                        </div>
+                        <div class="d-flex flex-column align-items-center">
+                            <i class="bi bi-sunset-fill fs-3"></i>
+                            <p>{{dataNow.sunSet | date:'hh:mm:ss'}}</p>
+                        </div>
+                      
+    
+                    </div>
+
+
+
+
+
+
+
+
+                <!--  -->
+                <p class="align-self-end btn btn-primary" style="margin-bottom: 0px;" 
+                (click)="displ()">
                     more Details</p>
             </div>
         </div>
 
         <div class=" d-flex flex-column">
+            
             <div
                 class="bodyWeather footer   d-flex justify-content-between gap-4 p-2">
                 <div style="cursor: pointer;"
@@ -62,6 +87,7 @@
     </div>
 
     <div *ngIf="showDetails && DailyData" #targetElement id="#aa" class="mbView px-5 d-flex flex-column justify-content-between w-40">
+        <h1>Per Hour</h1>
         <div class=" footer  flex-column  d-flex justify-content-between gap-4 pt-2">
             <div
                 class="d-flex dd p-2 flex-column gap-10 justify-content-between align-items-center bodyWeather"
@@ -80,7 +106,7 @@
                     </div>
                     <i class="bi bi-caret-down-fill "></i>
                 </div>
-                <div class=" det d-flex flex-wrap gap-2 ">
+                <div class=" det d-flex flex-wrap gap-2 justify-content-between" style="padding: 0 15px;">
                     <h4 style="width: 100%;">
                         {{CloudObject[DailyData.hourly.weathercode[i]].text}}</h4>
                     <div class="classDet"><span> Wind </span> <strong>

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild,AfterViewInit } from '@angular/core';
 import{HttpClient}from '@angular/common/http'
 import { Observable, catchError, concatMap, of, switchMap } from 'rxjs';
 import { WeatherDetailsComponent } from './components/weather-details/weather-details.component';
@@ -8,98 +8,53 @@ import { DataTreatService } from './services/data-treat.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  @ViewChild(WeatherDetailsComponent) weatherDetailsComponent: WeatherDetailsComponent |undefined;
-constructor(private DataTreatService:DataTreatService,private http:HttpClient){
-  const city = localStorage.getItem('city')
-    if( city ) {
-      this.cityChosen=JSON.parse(city)
-      this.searchText=this.cityChosen.name
-     this.onGetWeatherData(this.cityChosen.latitude,this.cityChosen.longitude)
-    }
-}
-backupDa:boolean=false
+export class AppComponent  {
+  lat: number=0;
+ lng: number=0;
 
-  loader:boolean=false
-  showDetails:boolean=false
-  searchText: any;
-  backgroundImage="./assets/sky.jpg"
-  zindex: boolean = false
-  cityChosen:any =""
-  cityData:any={}
-   date= new Date()
-  backupDAta:any={}
-   ngOnInit(){
-    const hours = this.date.getHours();
-    if((hours >= 19 && hours <= 23) || (hours >= 0 && hours <= 6)) 
-    { this.backgroundImage="./assets/images/nightsky.jpg"
-      this.zindex=true
+ ngOnInit(){
+  const hours = this.date.getHours();
+  if((hours >= 19 && hours <= 23) || (hours >= 0 && hours <= 6)) 
+  { this.backgroundImage="./assets/images/nightsky.jpg"
+    this.zindex=true
+  }
+  const city = localStorage.getItem('city')
+  if( city ) {
+     this.backupDAta=JSON.parse(city)
+    this.onGetWeatherData( this.backupDAta.latitude,this.backupDAta.longitude)
+  }  else {
+    this.getLocation();
+   
+
+
+  } 
+ }
+
+   getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        if (position) {
+          
+          this.lat = position.coords.latitude;
+          this.lng = position.coords.longitude;
+        
+          this.onGetWeatherData(this.lat, this.lng);
+          this.backupDAta.latitude=position.coords.latitude
+          this.backupDAta.longitude = position.coords.longitude;
+        }
+      },
+        (error) => alert("Coudn't get  your Location please allow Location Access ."));
+    } else {
+      alert("Geolocation is not supported by this browser.");
     }
-    const city = localStorage.getItem('city')
-    if( city ) {
-       this.backupDAta=JSON.parse(city)
-      this.onGetWeatherData( this.backupDAta.latitude,this.backupDAta.longitude)
     
 
-
-    }
-  /*   else {
-      console.log('here')
-     
-      let ip:any
-      this.http.get('https://api.ipify.org/?format=json')
-      .pipe(
-        switchMap((res: any) => {
-          const ip = res.ip;
-          console.log(ip)
-          return this.http.get(`https://api.ipstack.com/${ip}?access_key=bead45e80a55de67c7e7c7cfb6964e1d/`);
-        }),
-        catchError((error) => {
-          // Handle the error
-          console.error('Error:', error);
-          return of(null); // Return an empty observable or default value if needed
-        })
-      )
-      .subscribe((res: any) => {
-        if (res) {
-          this.backupDAta = res;
-          this.getLocation();
-        } else {
-          // Handle the case where the second request failed or returned null
-        }
-      });
-    }  */
-   }
+  }
   
-   /**Location  */
- /*   getLocation(): void{
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position)=>{
-          const longitude :any = position.coords.longitude;
-          const latitude:any = position.coords.latitude;
-          console.log(latitude,longitude)
-         this.onGetWeatherData(latitude,longitude)
-        
-        });
-    } else {
-       console.log("No support for geolocation")
-    }
-  } */
-   
-  
-  /* Remove selected data */
-   destroyCity(){
-      this.showDetails=false
-      localStorage.removeItem('city')
-      this.cityData={}
-      this.cityChosen=""
-      this.searchText=null
-   }
- 
    /* Get country selected data */
-  onGetWeatherData(latitude: number,longitude: number): void {
+    onGetWeatherData(latitude: number,longitude: number) {
     this.loader=true
-    const api=`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relativehumidity_2m,weathercode,windspeed_180m,winddirection_180m&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FLondon&daily=weathercode`
+    const api=`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relativehumidity_2m,weathercode,windspeed_180m,winddirection_180m&daily=temperature_2m_max,sunrise,sunset,temperature_2m_min&timezone=Europe%2FLondon&daily=weathercode`
     this.DataTreatService.getWeatherData(api).subscribe(
       (response) => {
         this.cityData.daily=response.daily;
@@ -115,6 +70,36 @@ backupDa:boolean=false
       }
     );
   }
+  @ViewChild(WeatherDetailsComponent) weatherDetailsComponent: WeatherDetailsComponent |undefined;
+constructor(public DataTreatService:DataTreatService,private http:HttpClient){
+
+}
+backupDa:boolean=false
+  countriesLooder=false
+  loader:boolean=false
+  showDetails:boolean=false
+  searchText: any;
+  backgroundImage="./assets/sky.jpg"
+  zindex: boolean = false
+  cityChosen:any =""
+  cityData:any={}
+   date= new Date()
+  backupDAta:any={}
+
+  
+  
+
+  
+  /* Remove selected data */
+   destroyCity(){
+      this.showDetails=false
+      localStorage.removeItem('city')
+      this.cityData={}
+      this.cityChosen=""
+      this.searchText=null
+   }
+ 
+
  
 /* Get Images of countries based on  country Code*/
   getImageSource(key: any): string {
@@ -135,10 +120,13 @@ backupDa:boolean=false
  /* search for countries*/
   coutriesSearched:any
   getAllPlaces(): void {
+    this.countriesLooder=true
     this.DataTreatService.getWeatherData(`https://geocoding-api.open-meteo.com/v1/search?name=${this.searchText}&count=20&language=en&format=json`).subscribe(
       (response) => {
         this.coutriesSearched=response.results
-        
+        this.coutriesSearched.fullName= this.DataTreatService.getLocationDetails(response.results)
+        this.countriesLooder=false
+
       },
       (error) => {console.error(error);}
     );

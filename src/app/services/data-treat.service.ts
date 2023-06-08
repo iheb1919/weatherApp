@@ -14,5 +14,17 @@ export class DataTreatService {
    return this.http.get<any>(apiUrl);
   }
   
-
+   getLocationDetails(location: { [key: string]: any }): string {
+    const { name, country, admin1, admin2, admin3 } = location;
+  
+    // Create an array of the properties
+    const properties: (string | undefined)[] = [name, admin1, admin2, admin3, country];
+  
+    // Filter out undefined properties and join with a comma separator
+    let result = properties.filter(Boolean).join(", ");
+    if (result.length==0) result=" Place UNKNOWN ???"
+  
+    return result;
+  }
+  
 }

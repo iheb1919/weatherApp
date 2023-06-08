@@ -2,6 +2,7 @@
 
 <div class="loader"></div>
 </div>
+
 <div class="containerr m-0 " [style.backgroundImage]="'url(' + backgroundImage + ')'">
   <div class="blur" [ngStyle]="zindex ? { 'display': 'none' } : null" ></div>
   <div class="containerf m-0 d-flex flex-column justify-content-center align-items-center">
@@ -14,12 +15,18 @@
       <div class="dropdown-menu text-small shadow p-0" 
         aria-labelledby="dropdownNotification">
        
-        <ul style="max-height: 500px; overflow-y: auto; " class="list-group">
-          <li  class="list-group-item  " *ngIf="!coutriesSearched"> None</li>
-          <li  class="list-group-item  " (click)="setName(item)" *ngFor="let item of coutriesSearched "  [attr.data-value]="item.name" > 
+        <ul style="max-height: 500px; overflow-y: auto; border: 10px; " class="list-group">
+         
+          <li *ngIf="countriesLooder ;" class="list-group-item  d-flex justify-content-center align-items-center" style="height: 45px; padding: 0px;" ><div class="loader" style=" width: 30px; height: 30px; border: 5px solid #f3f3f3; border-top: 5px solid #3498db; "></div>  </li>
+         <li  class="list-group-item  " *ngIf="!countriesLooder && !coutriesSearched"> None</li>
+         <ng-template [ngIf]="!countriesLooder && coutriesSearched">
+          <li  class="list-group-item"  (click)="setName(item)" *ngFor="let item of coutriesSearched "  [attr.data-value]="item.name" > 
             <img [src]="getImageSource(item.country_code)" height="20px" width="30px" alt="">
-            {{item.name}}  ,{{item.admin1}}, {{item.country}}
+           <!--  {{item.name}}  ,{{item.admin1}}, {{item.country}} -->
+           {{ DataTreatService.getLocationDetails(item) }}
+           
           </li>
+        </ng-template>
         </ul>
         
       </div>

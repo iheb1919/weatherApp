@@ -29,18 +29,33 @@ export class AppComponent  {
 
   } 
  }
+ async getExactLoca(alt:number,lng:number){
+  const api=`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${alt}&longitude=${lng}&localityLanguage=en`
+  await this.DataTreatService.getWeatherData(api).subscribe(
+    (response)=>{
+      this.backupDAta.country=response.countryName
+      this.backupDAta.admin2=response.principalSubdivision
+      this.backupDAta.admin1=response.locality
+      this.backupDAta.latitude=response.latitude
+      this.backupDAta.longitude=response.longitude
+
+      console.log("app new backupData" ,this.backupDAta)
+
+    }
+  )
+
+ }
 
    getLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         if (position) {
-          
           this.lat = position.coords.latitude;
           this.lng = position.coords.longitude;
-        
           this.onGetWeatherData(this.lat, this.lng);
-          this.backupDAta.latitude=position.coords.latitude
-          this.backupDAta.longitude = position.coords.longitude;
+         /*  this.backupDAta.latitude=position.coords.latitude
+          this.backupDAta.longitude = position.coords.longitude; */
+          this.getExactLoca(this.lat, this.lng)
         }
       },
         (error) => alert("Coudn't get  your Location please allow Location Access ."));
@@ -59,11 +74,15 @@ export class AppComponent  {
       (response) => {
         this.cityData.daily=response.daily;
         this.cityData.hourly=response.hourly
-        this.weatherDetailsComponent?.updateCityData(this.cityData); 
+        if(this.weatherDetailsComponent){
+          console.log("in")
+          this.weatherDetailsComponent?.updateCityData(this.cityData); 
         this.weatherDetailsComponent?.updateCityName(this.backupDAta); 
-        this.weatherDetailsComponent?.hourlyDetails(this.date.toISOString())
+        this.weatherDetailsComponent?.hourlyDetails(this.date.toISOString())}
+        else console.log("out")
         this.backupDa=true
         this.loader=false
+        console.log("app CityData",this.cityData)
       },
       (error) => {
         console.error(error);

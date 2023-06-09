@@ -6,9 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class DataTreatService {
-  constructor(private http:HttpClient){
-   
-  }
+  constructor(private http:HttpClient){}
   loader:boolean=false
   getWeatherData(apiUrl: string): Observable<any> {
    return this.http.get<any>(apiUrl);
@@ -16,7 +14,7 @@ export class DataTreatService {
   
    getLocationDetails(location: { [key: string]: any }): string {
     const { name, country, admin1, admin2, admin3 } = location;
-  
+    console.log(location)
     // Create an array of the properties
     const properties: (string | undefined)[] = [name, admin1, admin2, admin3, country];
   

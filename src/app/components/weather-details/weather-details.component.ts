@@ -33,9 +33,9 @@ export class WeatherDetailsComponent {
     temperature_2m_min:""
   }
   ngOnInit(){
+
     this.updateCityData(this.cityData)
     this.updateCityName(this.backupDAta)
-    
     this.hourlyDetails(this.myDate.toISOString().split('T')[0])
   }
 
@@ -72,6 +72,7 @@ displ(){
    updateCityName(newCityData: any): void {
     this.cityName = newCityData;
     this.cityName.fullName=this.DataTreatService.getLocationDetails(newCityData)
+
   } 
  
   TempNowByHour(){

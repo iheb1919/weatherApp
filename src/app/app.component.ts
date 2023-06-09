@@ -39,7 +39,6 @@ export class AppComponent  {
       this.backupDAta.latitude=response.latitude
       this.backupDAta.longitude=response.longitude
 
-      console.log("app new backupData" ,this.backupDAta)
 
     }
   )
@@ -74,15 +73,14 @@ export class AppComponent  {
       (response) => {
         this.cityData.daily=response.daily;
         this.cityData.hourly=response.hourly
-        if(this.weatherDetailsComponent){
-          console.log("in")
+        
           this.weatherDetailsComponent?.updateCityData(this.cityData); 
         this.weatherDetailsComponent?.updateCityName(this.backupDAta); 
-        this.weatherDetailsComponent?.hourlyDetails(this.date.toISOString())}
-        else console.log("out")
+        this.weatherDetailsComponent?.hourlyDetails(this.date.toISOString())
+        
         this.backupDa=true
         this.loader=false
-        console.log("app CityData",this.cityData)
+      
       },
       (error) => {
         console.error(error);
